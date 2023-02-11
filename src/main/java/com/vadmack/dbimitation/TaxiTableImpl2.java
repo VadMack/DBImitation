@@ -12,15 +12,16 @@ import java.nio.file.Path;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-public class TaxiTableImpl implements TaxiTable {
-
+public class TaxiTableImpl2 implements TaxiTable {
     private static final String DATETIME_PATTERN = "yyyy-MM-dd HH:mm:ss";
     private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern(DATETIME_PATTERN);
 
-    private final ArrayList<TaxiRide> rides = new ArrayList<>();
+    private final List<TaxiRide> rides = new ArrayList<>();
 
     @Getter
     @AllArgsConstructor
@@ -44,12 +45,26 @@ public class TaxiTableImpl implements TaxiTable {
                     Integer.parseInt(rec.get(Headers.PASSENGER_COUNT.getFieldName())));
             rides.add(ride);
         }
+
+        rides.sort(Comparator.comparing(TaxiRide::getTpepDropoffDatetime));
     }
 
     @Override
     public Map<Integer, Double> getAverageDistances(LocalDateTime start, LocalDateTime end) {
-        return rides.stream().filter(ride -> !ride.getTpepPickupDatetime().isBefore(start) &&
-                !ride.getTpepDropoffDatetime().isAfter(end)).collect(Collectors.groupingBy(TaxiRide::getPassengerCount,
+        List<TaxiRide> pool = new ArrayList<>();
+        for (TaxiRide ride : rides) {
+            //System.out.println(ride.getTpepPickupDatetime() + "\t" + ride.getTpepDropoffDatetime());
+
+            if (ride.getTpepDropoffDatetime().isAfter(end)) {
+                break;
+            } else {
+                if (!ride.getTpepPickupDatetime().isBefore(start)) {
+                    pool.add(ride);
+                }
+            }
+        }
+
+        return pool.stream().collect(Collectors.groupingBy(TaxiRide::getPassengerCount,
                 Collectors.averagingDouble(TaxiRide::getTripDistance)));
     }
 }

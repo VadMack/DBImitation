@@ -9,8 +9,8 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 public class TaxiRide {
 
-    private double tripDistance;
-    private LocalDateTime tpepPickupDatetime;
-    private LocalDateTime tpepDropoffDatetime;
-    private int passengerCount;
+    private final double tripDistance;
+    private final LocalDateTime tpepPickupDatetime;
+    private final LocalDateTime tpepDropoffDatetime;
+    private final int passengerCount;
 }
