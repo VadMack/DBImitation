@@ -63,6 +63,25 @@ class TaxiTableImplTest {
         assertTrue(isMapsEqual(expected, result));
     }
 
+    @Test
+    void getAverageDistances3() {
+        Map<Integer, Double> expected = new HashMap<>();
+        expected.put(1, 0.9715);
+        expected.put(2, 1.1174);
+        expected.put(3, 1.0633);
+        expected.put(4, 0.652);
+        expected.put(5, 0.8711);
+        expected.put(6, 0.93);
+
+        long timerStart = System.currentTimeMillis();
+        Map<Integer, Double> result = taxiTable.getAverageDistances(
+                LocalDateTime.of(2016, 1, 2, 1, 37, 0),
+                LocalDateTime.of(2016, 1, 2, 1, 45,  0));;
+        log.debug("Request execution time: " + (System.currentTimeMillis() - timerStart));
+        System.out.println(result);
+
+        assertTrue(isMapsEqual(expected, result));
+    }
 
     public static boolean isMapsEqual(Map<Integer, Double> expected, Map<Integer, Double> result) {
         Set<Integer> keySet1 = expected.keySet();

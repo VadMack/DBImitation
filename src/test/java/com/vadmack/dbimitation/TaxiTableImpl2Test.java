@@ -7,6 +7,7 @@ import org.junit.jupiter.api.Test;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.time.LocalDateTime;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -56,6 +57,41 @@ class TaxiTableImpl2Test {
         Map<Integer, Double> result = taxiTable.getAverageDistances(
                 LocalDateTime.of(2016, 1, 28, 0, 1, 19),
                 LocalDateTime.of(2016, 1, 29, 10, 20,  30));
+        log.debug("Request execution time: " + (System.currentTimeMillis() - timerStart));
+        System.out.println(result);
+
+        assertTrue(isMapsEqual(expected, result));
+    }
+
+    @Test
+    void getAverageDistances3() {
+        Map<Integer, Double> expected = new HashMap<>();
+        expected.put(1, 0.9715);
+        expected.put(2, 1.1174);
+        expected.put(3, 1.0633);
+        expected.put(4, 0.652);
+        expected.put(5, 0.8711);
+        expected.put(6, 0.93);
+
+        long timerStart = System.currentTimeMillis();
+        Map<Integer, Double> result = taxiTable.getAverageDistances(
+                LocalDateTime.of(2016, 1, 2, 1, 37, 0),
+                LocalDateTime.of(2016, 1, 2, 1, 45,  0));
+        log.debug("Request execution time: " + (System.currentTimeMillis() - timerStart));
+        System.out.println(result);
+
+        assertTrue(isMapsEqual(expected, result));
+    }
+
+
+    @Test
+    void getAverageDistancesNotFound() {
+        Map<Integer, Double> expected = Collections.emptyMap();
+
+        long timerStart = System.currentTimeMillis();
+        Map<Integer, Double> result = taxiTable.getAverageDistances(
+                LocalDateTime.of(2016, 1, 2, 1, 37, 0),
+                LocalDateTime.of(2016, 12, 2, 1, 45,  0));
         log.debug("Request execution time: " + (System.currentTimeMillis() - timerStart));
         System.out.println(result);
 

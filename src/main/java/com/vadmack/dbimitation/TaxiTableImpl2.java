@@ -11,10 +11,7 @@ import java.io.Reader;
 import java.nio.file.Path;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class TaxiTableImpl2 implements TaxiTable {
@@ -51,20 +48,36 @@ public class TaxiTableImpl2 implements TaxiTable {
 
     @Override
     public Map<Integer, Double> getAverageDistances(LocalDateTime start, LocalDateTime end) {
-        List<TaxiRide> pool = new ArrayList<>();
-        for (TaxiRide ride : rides) {
+        int indexOfMaxAllowed = findIndexOfLastSuitableValue(end);
+        if (indexOfMaxAllowed == -1) {
+            return Collections.emptyMap();
+        }
+        rides.subList(0, indexOfMaxAllowed);
+        return rides.subList(0, indexOfMaxAllowed).stream().filter(ride -> {
             //System.out.println(ride.getTpepPickupDatetime() + "\t" + ride.getTpepDropoffDatetime());
+            return !ride.getTpepPickupDatetime().isBefore(start);
+        })
+                .collect(Collectors.groupingBy(TaxiRide::getPassengerCount,
+                Collectors.averagingDouble(TaxiRide::getTripDistance)));
+    }
 
-            if (ride.getTpepDropoffDatetime().isAfter(end)) {
-                break;
-            } else {
-                if (!ride.getTpepPickupDatetime().isBefore(start)) {
-                    pool.add(ride);
-                }
+    private int findIndexOfLastSuitableValue(LocalDateTime target) {
+        int start = 0;
+        int end = rides.size() - 1;
+
+        int ans = -1;
+        while (start <= end) {
+            int mid = (start + end) / 2;
+
+            if (!rides.get(mid).getTpepDropoffDatetime().isAfter(target)) {
+                start = mid + 1;
+            }
+
+            else {
+                ans = mid;
+                end = mid - 1;
             }
         }
-
-        return pool.stream().collect(Collectors.groupingBy(TaxiRide::getPassengerCount,
-                Collectors.averagingDouble(TaxiRide::getTripDistance)));
+        return ans;
     }
 }
