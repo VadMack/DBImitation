@@ -12,7 +12,6 @@ import java.nio.file.Path;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
-import java.util.stream.Collectors;
 
 public class TaxiTableImpl2 implements TaxiTable {
     private static final String DATETIME_PATTERN = "yyyy-MM-dd HH:mm:ss";
@@ -52,13 +51,24 @@ public class TaxiTableImpl2 implements TaxiTable {
         if (indexOfMaxAllowed == -1) {
             return Collections.emptyMap();
         }
-        rides.subList(0, indexOfMaxAllowed);
-        return rides.subList(0, indexOfMaxAllowed).stream().filter(ride -> {
-            //System.out.println(ride.getTpepPickupDatetime() + "\t" + ride.getTpepDropoffDatetime());
-            return !ride.getTpepPickupDatetime().isBefore(start);
-        })
-                .collect(Collectors.groupingBy(TaxiRide::getPassengerCount,
-                Collectors.averagingDouble(TaxiRide::getTripDistance)));
+
+        Map<Integer, Double> result = new HashMap<>();
+        Map<Integer, Integer> counter = new HashMap<>();
+
+        for (TaxiRide ride: rides.subList(0, indexOfMaxAllowed)) {
+            if (!ride.getTpepPickupDatetime().isBefore(start)) {
+                int pCount = ride.getPassengerCount();
+                double distance = ride.getTripDistance();
+                result.merge(pCount, distance, Double::sum);
+                counter.merge(pCount, 1, Integer::sum);
+            }
+        }
+
+        for (int key : result.keySet()) {
+            result.merge(key, (double) counter.get(key), (sum, number) -> (sum/number));
+        }
+
+        return result;
     }
 
     private int findIndexOfLastSuitableValue(LocalDateTime target) {

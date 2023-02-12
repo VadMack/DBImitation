@@ -39,6 +39,14 @@ public class Main {
 
         initAndExecute(new TaxiTableImpl(), 10000, taxi15k,
                 LocalDateTime.of(2016, 1, 1, 0, 1, 19),
+                LocalDateTime.of(2016, 1, 2, 2, 2,  35));
+        initAndExecute(new TaxiTableImpl2(), 10000, taxi15k,
+                LocalDateTime.of(2016, 1, 1, 0, 1, 19),
+                LocalDateTime.of(2016, 1, 2, 2, 2,  35));
+        System.out.println();
+
+        initAndExecute(new TaxiTableImpl(), 10000, taxi15k,
+                LocalDateTime.of(2016, 1, 1, 0, 1, 19),
                 LocalDateTime.of(2016, 1, 29, 10, 20,  30));
         initAndExecute(new TaxiTableImpl2(), 10000, taxi15k,
                 LocalDateTime.of(2016, 1, 1, 0, 1, 19),
